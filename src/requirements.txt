@@ -1,2 +1,5 @@
-httpx
+pydantic-ai-slim[openai]>=0.0.14
+pydantic>=2.7
+openai>=1.40
+opencv-python-headless>=4.10
 python-dotenv
