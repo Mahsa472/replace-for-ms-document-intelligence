@@ -36,17 +36,6 @@ RUN apt-get update \
 ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 
-# -- OpenCode CLI --
-ARG OPENCODE_VERSION=1.18.13
-ARG OPENCODE_SHA256="8d500b20fed2d26e537e221895b1a575476571b4f0089bb29fb13eeb8eb9e937"
-RUN curl -fsSL \
-       "https://github.com/anomalyco/opencode/releases/download/v${OPENCODE_VERSION}/opencode-linux-x64.tar.gz" \
-       -o /tmp/opencode.tar.gz \
-    && echo "${OPENCODE_SHA256}  /tmp/opencode.tar.gz" | sha256sum -c - \
-    && tar -xzf /tmp/opencode.tar.gz -C /usr/local/bin \
-    && chmod 755 /usr/local/bin/opencode \
-    && rm -f /tmp/opencode.tar.gz
-
 WORKDIR /app
 
 # -- Non-root user --

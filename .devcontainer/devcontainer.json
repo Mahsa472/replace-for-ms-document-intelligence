@@ -21,8 +21,7 @@
 				"mechatroner.rainbow-csv",
 				"tomoki1207.pdf",
 				"ryanluker.vscode-coverage-gutters",
-				"yzhang.markdown-all-in-one",
-				"sst-dev.opencode"
+				"yzhang.markdown-all-in-one"
 			],
 			"settings": {
 				"python.defaultInterpreterPath": "/app/.venv/bin/python"
