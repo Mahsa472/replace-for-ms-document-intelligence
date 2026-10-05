@@ -1,0 +1,40 @@
+{
+	"name": "replace-for-ms-document-intelligence",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"runServices": ["app", "docling"],
+	"workspaceFolder": "/workspaces/app",
+	"shutdownAction": "stopCompose",
+
+	"forwardPorts": [5001],
+	"portsAttributes": {
+		"5001": { "label": "docling-serve", "onAutoForward": "silent" }
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ClemensPeters.format-json",
+				"ms-python.black-formatter",
+				"mechatroner.rainbow-csv",
+				"tomoki1207.pdf",
+				"ryanluker.vscode-coverage-gutters",
+				"yzhang.markdown-all-in-one",
+				"sst-dev.opencode"
+			],
+			"settings": {
+				"python.defaultInterpreterPath": "/app/.venv/bin/python"
+			}
+		}
+	},
+
+	"containerEnv": {
+		"SHELL": "/bin/bash"
+	},
+
+	"containerUser": "app",
+	"remoteUser": "app",
+	"updateRemoteUserUID": false
+}
