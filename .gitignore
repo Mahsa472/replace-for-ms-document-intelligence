@@ -3,3 +3,8 @@
 __pycache__/
 *.pyc
 .env
+
+# runtime data (keep folder structure only)
+src/data/**
+!src/data/**/
+!src/data/**/.gitkeep
