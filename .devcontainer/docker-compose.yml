@@ -13,7 +13,7 @@ services:
         required: false
     environment:
       PYTHONPATH: /workspaces/app/src
-      DOCLING_URL: http://docling:5001
+      DOCLING_BASE_URL: http://docling:5001
     depends_on:
       docling:
         condition: service_healthy
