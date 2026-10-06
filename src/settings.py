@@ -1,7 +1,9 @@
-"""Central configuration, loaded from environment variables and src/credentials.env.
+"""Central configuration.
 
-Real environment variables win over values in credentials.env, so the same code
-works locally, in the devcontainer and in CI.
+Sources (real environment variables always win):
+- .devcontainer/.devcontainer.env -> Docling URL / API key (compose also injects
+  these into the container; read here too so it works outside the container)
+- src/credentials.env              -> LLM model, API key, base URL
 """
 
 from __future__ import annotations
@@ -13,22 +15,26 @@ from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 SRC_DIR = Path(__file__).resolve().parent
+REPO_DIR = SRC_DIR.parent
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=SRC_DIR / "credentials.env",
+        env_file=(
+            REPO_DIR / ".devcontainer" / ".devcontainer.env",
+            SRC_DIR / "credentials.env",
+        ),
         env_file_encoding="utf-8",
         extra="ignore",
         env_ignore_empty=True,  # "LLM_BASE_URL=" counts as unset
     )
 
-    # ---- LLM (any OpenAI-compatible endpoint) ----
+    # ---- LLM (credentials.env; any OpenAI-compatible endpoint) ----
     llm_model: str
     llm_api_key: SecretStr
     llm_base_url: str | None = None  # None -> api.openai.com
 
-    # ---- Docling ----
+    # ---- Docling (.devcontainer.env) ----
     docling_base_url: str = "http://docling:5001"
     docling_api_key: SecretStr | None = None
     docling_timeout: float = 620  # a bit longer than DOCLING_SERVE_MAX_SYNC_WAIT (600)
