@@ -17,7 +17,7 @@ if TYPE_CHECKING:
     from schema import AccountStatement, StatementSection
 
 
-def _to_decimal(value: object) -> Decimal | None:
+def to_decimal(value: object) -> Decimal | None:
     """Best-effort Decimal conversion; None when the value is empty or not numeric."""
     if value is None:
         return None
@@ -51,9 +51,13 @@ def main_class(statement: AccountStatement, section: StatementSection) -> str:
     return " ".join(p for p in (statement.line_of_business, section.title) if p).strip()
 
 
-def is_balance_class(value: object) -> bool:
-    """True when the accounting class text contains 'balance'."""
-    return isinstance(value, str) and "balance" in value.casefold()
+def is_summary_row(label: object) -> bool:
+    """True for total/summary rows that should not become output rows
+    ('Balance', 'Due to you', 'Due from you')."""
+    if not isinstance(label, str):
+        return False
+    text = label.casefold()
+    return any(k in text for k in ("balance", "due to you", "due from you"))
 
 
 # ---- Business rules ---------------------------------------------------------
@@ -75,7 +79,7 @@ def apply_outstanding_loss_logic(
     if "outstanding loss" not in name.casefold():
         return name, amount
 
-    value = _to_decimal(amount.strip().replace(",", ".") if isinstance(amount, str) else amount)
+    value = to_decimal(amount.strip().replace(",", ".") if isinstance(amount, str) else amount)
     if value is not None and value > 0:
         amount = f"-{amount.strip()}" if isinstance(amount, str) else -amount
 
@@ -95,18 +99,21 @@ def detect_signs(amounts: list[object], labels: list[str | None], balance: objec
     Pass 1: every row counts; find the ONE sign combination whose sum equals balance.
     Pass 2 (only if pass 1 finds nothing): one row is treated as not part of the
             sum (it is kept negative) and the rest must equal balance.
-    'Outstanding' rows are never changed. If no unique solution exists, the
-    original amounts are returned unchanged.
+    'Outstanding', zero and summary rows ('Due to you', ...) are never changed.
+    If no unique solution exists, the original amounts are returned unchanged.
     Cost grows with 2^rows, which is fine for typical statements (< ~15 rows).
     """
-    target = _to_decimal(balance)
+    target = to_decimal(balance)
     if target is None or len(amounts) != len(labels):
         return amounts
 
-    parsed = [_to_decimal(a) for a in amounts]
+    parsed = [to_decimal(a) for a in amounts]
+    # Only rows whose sign can matter: non-zero, not 'Outstanding', not a summary row.
     idx = [
         i for i, v in enumerate(parsed)
-        if v is not None and "outstanding" not in (labels[i] or "").casefold()
+        if v
+        and "outstanding" not in (labels[i] or "").casefold()
+        and not is_summary_row(labels[i])
     ]
     if not idx:
         return amounts
