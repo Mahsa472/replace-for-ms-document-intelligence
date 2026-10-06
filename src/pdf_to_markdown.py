@@ -33,7 +33,7 @@ def pdf_to_markdown(pdf_path: str | Path, **options: str) -> str:
                 "do_ocr": "false",
                 "do_table_structure": "true",
                 "table_mode": "accurate",
-                "image_export_mode": "placeholder",  # do not extract the images
+                "image_export_mode": "placeholder",  # do not extract the images if you don't need, it makes extra tokens!
                 **options,
             },
         )
