@@ -2,18 +2,23 @@
 
 from __future__ import annotations
 
-import os
+from functools import cache
 from pathlib import Path
 
 import httpx
 
-_api_key = os.environ.get("DOCLING_API_KEY")
+from settings import get_settings
 
-_client = httpx.Client(
-    base_url=os.environ.get("DOCLING_BASE_URL", "http://docling:5001"),
-    headers={"X-Api-Key": _api_key} if _api_key else None,
-    timeout=620,  # a bit longer than DOCLING_SERVE_MAX_SYNC_WAIT (600)
-)
+
+@cache
+def _client() -> httpx.Client:
+    s = get_settings()
+    key = s.docling_api_key
+    return httpx.Client(
+        base_url=s.docling_base_url,
+        headers={"X-Api-Key": key.get_secret_value()} if key else None,
+        timeout=s.docling_timeout,
+    )
 
 
 def pdf_to_markdown(pdf_path: str | Path, **options: str) -> str:
@@ -25,7 +30,7 @@ def pdf_to_markdown(pdf_path: str | Path, **options: str) -> str:
     """
     pdf_path = Path(pdf_path)
     with pdf_path.open("rb") as f:
-        response = _client.post(
+        response = _client().post(
             "/v1/convert/file",
             files={"files": (pdf_path.name, f, "application/pdf")},
             data={

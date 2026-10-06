@@ -8,3 +8,6 @@ __pycache__/
 src/data/**
 !src/data/**/
 !src/data/**/.gitkeep
+
+# secrets
+src/credentials.env
