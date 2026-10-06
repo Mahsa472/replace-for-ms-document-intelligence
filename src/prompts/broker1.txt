@@ -1,31 +1,31 @@
 Broker: broker1 — "TREATY BALANCE ADVICE".
 
 Where each field sits on this layout:
-- reinsured.name: the 'Reinsured:' line.
-- contract: the 'Interest:' line (e.g. 'Property Quota Share').
-- business_type: the 'Type:' line (e.g. 'Non Marine').
-- risk_reference: the 'Risk Reference' field in the top-right header.
-- transaction_reference: the 'Transaction Ref.' field in the header.
-- account_number: the 'Account Number' field in the header.
-- advice_date: the 'Date' field in the header.
-- your_share: read the percentage in the 'Your Share X%' column header -> without % sign -> X.
-- period.account_from / account_to: the 'A/C for <from> to <to>' line under the title or Sliding Scale Commission as at <to>
-- period.treaty_from / treaty_to: the 'Period:' line in the reinsured block.
-- Date output format: YYYY.MM.DD.
+- cedent.name: the 'Reinsured:' line.
+- treaty_name: the 'Interest:' line (e.g. 'Property Quota Share').
+- line_of_business: the 'Type:' line (e.g. 'Non Marine').
+- contract_reference: the 'Risk Reference' field in the top-right header.
+- document_reference: the 'Transaction Ref.' field in the header.
+- account_id: the 'Account Number' field in the header.
+- statement_date: the 'Date' field in the header.
+- share_percent: read the percentage in the 'Your Share X%' column header -> without % sign -> X.
+- period.accounting_start / accounting_end: the 'A/C for <from> to <to>' line under the title or Sliding Scale Commission as at <to>
+- period.coverage_start / coverage_end: the 'Period:' line in the reinsured block.
+- Date output format: YYYY-MM-DD.
 
-tables: the advice has ONE OR MORE balance tables. Emit one entry per table.
+sections: the advice has ONE OR MORE balance tables. Emit one section per table.
 For EACH table:
-- name: the section heading that appears between the header block and the first
+- title: the section heading that appears between the header block and the first
   data row of this table — directly above the currency column header (e.g.
   'Section A', 'Section B'). This is NOT the 'Interest:' line or any
   field from the reinsured/period/type block at the top of the document.
-  (Do NOT prepend the Type here; the main class is built later from Type + name.)
+  (Do NOT prepend the Type here; the main class is built later from Type + title.)
 - currency: the currency label shown above that table (e.g. 'USD').
-- line_items: its rows.
+- rows: its rows.
   COLUMN RULE: When the table has TWO value columns ('100% Amounts' and 'Your Share'),
-  put values in amount_100 and amount_share respectively.
+  put values in amount_total and amount_share respectively.
   When the table has only ONE value column (no '100% Amounts' / 'Your Share' split),
-  put ALL values into amount_share and leave amount_100 as null.
-- due_to_you: that table's 'Due to you' or 'Due from you' row, Your Share column.
+  put ALL values into amount_share and leave amount_total as null.
+- balance: that table's 'Due to you' or 'Due from you' row, Your Share column.
   'Due to you' -> positive, 'Due from you' -> negative.
 - settlement: that table's 'To be settled as' currency + amount, and 'Rate of Exchange'.

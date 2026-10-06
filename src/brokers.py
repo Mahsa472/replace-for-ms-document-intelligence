@@ -1,6 +1,6 @@
 """Broker registry + detection + prompt loading.
 
-There is ONE schema (schema.ClosingAdvice) for every broker, because the output
+There is ONE schema (schema.AccountStatement) for every broker, because the output
 is always the same. Only the PROMPT changes per broker — it tells the LLM where
 each field sits on that broker's layout. So adding a broker never touches the
 schema or the CSV.

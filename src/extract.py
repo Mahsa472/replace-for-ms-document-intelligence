@@ -16,26 +16,26 @@ from pydantic_ai.providers.openai import OpenAIProvider
 from pydantic_ai.settings import ModelSettings
 
 from brokers import Broker, detect_broker, load_prompt
-from schema import ClosingAdvice
+from schema import AccountStatement
 from settings import get_settings
 
 
 @cache
-def _agent_for(broker: Broker) -> Agent[None, ClosingAdvice]:
+def _agent_for(broker: Broker) -> Agent[None, AccountStatement]:
     """One agent per broker, built once and reused across PDFs."""
     s = get_settings()
     client = AsyncOpenAI(api_key=s.llm_api_key.get_secret_value(), base_url=s.llm_base_url)
     model = OpenAIChatModel(s.llm_model, provider=OpenAIProvider(openai_client=client))
     return Agent(
         model,
-        output_type=ClosingAdvice,
+        output_type=AccountStatement,
         system_prompt=load_prompt(broker),
         # Routes same-broker requests to the same prompt cache (improves hit rate).
         model_settings=ModelSettings(extra_body={"prompt_cache_key": f"closing-advice-{broker.key}"}),
     )
 
 
-def extract(markdown_text: str) -> tuple[ClosingAdvice, dict]:
+def extract(markdown_text: str) -> tuple[AccountStatement, dict]:
     """Detect the broker, run extraction, and return output plus token usage."""
     broker = detect_broker(markdown_text)
     result = _agent_for(broker).run_sync(markdown_text)
