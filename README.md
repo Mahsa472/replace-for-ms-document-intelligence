@@ -8,6 +8,22 @@ Extract structured data from PDFs **without a cloud form-recognition service** (
 
 The example targets **reinsurance treaty balance statements** from brokers, but steps 1–2 work with any schema.
 
+## Fully local (no data leaves your machine, no API cost)
+
+Docling already runs locally. Point the LLM at a local OpenAI-compatible server
+(e.g. [Ollama](https://ollama.com), vLLM, LM Studio) and the whole pipeline runs
+**100% on your machine with no API cost**:
+
+```env
+# src/credentials.env — Ollama running on the host
+LLM_MODEL=<a local model, e.g. one pulled with `ollama pull`>
+LLM_API_KEY=ollama            # any non-empty value
+LLM_BASE_URL=http://host.docker.internal:11434/v1
+```
+
+Pick a model that supports structured output / tool calling; larger models give
+noticeably better extraction quality.
+
 ## Pipeline
 
 ```
@@ -58,22 +74,6 @@ cp src/credentials.env.example src/credentials.env                           # L
 |------|-----------|
 | `.devcontainer/.devcontainer.env` | `DOCLING_BASE_URL` (default `http://docling:5001`), `DOCLING_API_KEY` (optional) |
 | `src/credentials.env` | `LLM_MODEL`, `LLM_API_KEY` (required), `LLM_BASE_URL` (empty = OpenAI) |
-
-### Fully local (no data leaves your machine, no API cost)
-
-Docling already runs locally. Point the LLM at a local OpenAI-compatible server
-(e.g. [Ollama](https://ollama.com), vLLM, LM Studio) and the whole pipeline runs
-**100% on your machine with no API cost**:
-
-```env
-# src/credentials.env — Ollama running on the host
-LLM_MODEL=<a local model, e.g. one pulled with `ollama pull`>
-LLM_API_KEY=ollama            # any non-empty value
-LLM_BASE_URL=http://host.docker.internal:11434/v1
-```
-
-Pick a model that supports structured output / tool calling; larger models give
-noticeably better extraction quality.
 
 Then **Reopen in Container**. The first build pulls the Docling image (a few GB).
 Docling is also available at <http://localhost:5001/docs> and <http://localhost:5001/ui>.
